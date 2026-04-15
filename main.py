@@ -1,9 +1,10 @@
 import time
-import winsound
 import threading
-import keyboard
+from pynput import keyboard
 import pyautogui as pygui
 import random as rand
+import numpy as np
+import simpleaudio as sa
 
 from src.key_gen import text_to_strokes
 from src.text_gen import generate_text
@@ -23,16 +24,32 @@ COMMA_CHANCE = 0.30
 SENTENCE_BREAK_CHANCE = 0.20
 PARAGRAPH_CHANCE = 0.30
 
+# Sound definition
+SAMPLE_RATE = 44100
+GOOD_SOUND = None
+BAD_SOUND = None
+
+
+def make_tone(freq, duration=0.15, volume=0.3):
+    t = np.linspace(0, duration, int(SAMPLE_RATE * duration), False)
+    wave = np.sin(freq * 2 * np.pi * t)
+    audio = (wave * 32767 * volume).astype(np.int16)
+    return audio
+
+
+def pregenerate_sounds():
+    global GOOD_SOUND, BAD_SOUND
+    GOOD_SOUND = make_tone(1000, 0.12)
+    BAD_SOUND = make_tone(350, 0.18)
+
 
 def play_sound(sound='good', times=1):
+    if sound == 'good':
+        audio = GOOD_SOUND
+    else:
+        audio = BAD_SOUND
     for _ in range(times):
-        match sound:
-            case 'good':
-                winsound.Beep(1000, 200)  # Frequency: 1000Hz, Duration: 200ms
-            case 'bad':
-                winsound.Beep(400, 200)  # Frequency: 400Hz, Duration: 500ms
-            case _:
-                print(f"Unknown sound: {sound}")
+        sa.play_buffer(audio, 1, 2, SAMPLE_RATE)
 
 
 def type_something():
@@ -42,14 +59,20 @@ def type_something():
 
 
 def stop_listener(stop_flag):
-    keyboard.wait('esc')
-    play_sound('bad')
-    stop_flag['stop'] = True
+    def on_press(key):
+        if key == keyboard.Key.esc:
+            play_sound('bad')
+            stop_flag['stop'] = True
+            return False
+
+    with keyboard.Listener(on_press=on_press) as listener:
+        listener.join()
 
 
 def main():
+    pregenerate_sounds()
     stop_flag = {'stop': False}
-    threading.Thread(target=stop_listener, args=(stop_flag,), daemon=True).start()
+    threading.Thread(target=stop_listener, args=(stop_flag), daemon=True).start()
 
     for i in range(PRE_WAIT):
         print(PRE_WAIT - i)

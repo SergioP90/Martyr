@@ -2,19 +2,20 @@
 A simple program to simulate human writting to fool microsoft team's activity monitor
 
 
-![Version](https://img.shields.io/badge/Version-1.0-blue)
+![Version](https://img.shields.io/badge/Version-1.1-blue)
 ![Windows](https://img.shields.io/badge/Windows-COMPATIBLE-brightgreen) 
-![Linux](https://img.shields.io/badge/Linux-INCOMPATIBLE-yellow) 
-![Mac](https://img.shields.io/badge/MAC-INCOMPATIBLE-red) 
+![Linux](https://img.shields.io/badge/Linux-COMPATIBLE-brightgreen) 
+![Mac](https://img.shields.io/badge/MAC-UNTESTED-yellow) 
 
 
 ## 🛠 Requirements
 - Python 3.12.4 or higher  
-- keyboard 0.13.5
 - lorem_text 3.0
+- numpy 2.4.4
 - pyautogui 0.9.54
+- pynput 1.8.1
+- simpleaudio 1.0.4
 
----
 
 ## 💾 Installation
 
