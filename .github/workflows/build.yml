@@ -18,10 +18,12 @@ env:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout the specific tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}  # This ensures you build from the tagged code
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,7 +33,12 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-dev build-essential libasound2-dev
+          sudo apt-get install -y \
+            python3-dev \
+            build-essential \
+            libasound2-dev \
+            portaudio19-dev \
+            libportaudio2
 
       - name: Install dependencies
         run: |
@@ -52,13 +59,14 @@ jobs:
           name: ${{ env.APP_NAME }}${{ env.NAME_LINUX }}
           path: ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }}
 
-
   build-windows:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout the specific tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}  # Build from the tagged code
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -84,11 +92,11 @@ jobs:
           name: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}
           path: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}${{ env.EXTENSION_WINDOWS }}
 
-
   release:
     needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - name: Download Linux artifact
         uses: actions/download-artifact@v4
@@ -100,11 +108,13 @@ jobs:
         with:
           name: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}
 
-      - name: Create GitHub Release
+      - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Martyr ${{ github.event.inputs.tag }}"
-          body: ""
+          tag_name: ${{ inputs.tag }}
+          name: "Martyr ${{ inputs.tag }}"
+          body: "Release created retroactively for tag ${{ inputs.tag }}"
           files: |
             ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }}
             ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}${{ env.EXTENSION_WINDOWS }}
+          fail_on_unmatched_files: true

@@ -2,4 +2,4 @@ lorem_text==3.0
 numpy==2.4.4
 pyautogui==0.9.54
 pynput==1.8.1
-simpleaudio==1.0.4
+sounddevice==0.5.5

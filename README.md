@@ -14,7 +14,7 @@ A simple program to simulate human writting to fool microsoft team's activity mo
 - numpy 2.4.4
 - pyautogui 0.9.54
 - pynput 1.8.1
-- simpleaudio 1.0.4
+- sounddevice 0.5.5
 
 
 ## 💾 Installation
@@ -28,7 +28,7 @@ A simple program to simulate human writting to fool microsoft team's activity mo
 
 ### From exe
 1. Download the zip and extract  
-2. Run `Martyr.exe`  
+2. Run `Martyr.exe`  (or `Martyr` on Linux)
 
 
 ## 💡 Example Usage
