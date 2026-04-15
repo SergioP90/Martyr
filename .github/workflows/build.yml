@@ -1,9 +1,11 @@
-name: Build and Release Martyr
+name: Build and Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.1.0)"
+        required: true
 
 env:
   PYTHON_VERSION: "3.12.4"
@@ -101,7 +103,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Martyr ${{ github.ref_name }}"
+          name: "Martyr ${{ github.event.inputs.tag }}"
           body: ""
           files: |
             ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }}
