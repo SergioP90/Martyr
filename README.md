@@ -2,7 +2,7 @@
 A simple program to simulate human writting to fool microsoft team's activity monitor
 
 
-![Version](https://img.shields.io/badge/Version-1.1-blue)
+![Version](https://img.shields.io/badge/Version-1.1.2-blue)
 ![Windows](https://img.shields.io/badge/Windows-COMPATIBLE-brightgreen) 
 ![Linux](https://img.shields.io/badge/Linux-COMPATIBLE-brightgreen) 
 ![Mac](https://img.shields.io/badge/MAC-UNTESTED-yellow) 
