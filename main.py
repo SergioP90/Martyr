@@ -30,23 +30,17 @@ GOOD_SOUND = None
 BAD_SOUND = None
 
 
-def make_tone(freq, duration=0.15, volume=1.0):
-    t = np.linspace(0, duration, int(SAMPLE_RATE * duration), False)
-
-    wave = (
-        np.sin(2 * np.pi * freq * t) +
-        0.5 * np.sin(2 * np.pi * freq * 2 * t) +
-        0.25 * np.sin(2 * np.pi * freq * 3 * t)
-    )
-
-    audio = wave * volume
-    return audio.astype(np.float32)
 
 
-def pregenerate_sounds():
-    global GOOD_SOUND, BAD_SOUND
-    GOOD_SOUND = make_tone(400, 0.20, 1)
-    BAD_SOUND = make_tone(200, 0.25, 1)
+def make_tones():
+    """Generate a simple pure sine wave tone"""
+    global SAMPLE_RATE, GOOD_SOUND, BAD_SOUND
+    duration = 0.5
+    t = np.linspace(0, duration, int(SAMPLE_RATE * duration), endpoint=False)
+    low_freq = 220
+    BAD_SOUND = 0.2 * np.sin(2 * np.pi * low_freq * t)
+    high_freq = 880
+    GOOD_SOUND = 0.2 * np.sin(2 * np.pi * high_freq * t)
 
 
 def play_sound(sound='good', times=1):
@@ -79,7 +73,7 @@ def stop_listener(stop_flag):
 
 
 def main():
-    pregenerate_sounds()
+    make_tones()
     stop_flag = {'stop': False}
     
     listener_thread = threading.Thread(target=stop_listener, args=(stop_flag,), daemon=True)
