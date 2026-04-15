@@ -28,7 +28,7 @@ A simple program to simulate human writting to fool microsoft team's activity mo
 
 ### From exe
 1. Download the zip and extract  
-2. Run `Martyr.exe`  
+2. Run `Martyr.exe`  (or `Martyr` on Linux)
 
 
 ## 💡 Example Usage
