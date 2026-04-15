@@ -1,0 +1,103 @@
+name: Build and Release Martyr
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PYTHON_VERSION: "3.12.4"
+  APP_NAME: "Martyr"
+  NAME_LINUX: "-Linux"
+  NAME_WINDOWS: "-Windows"
+  EXTENSION_LINUX: ".tar.gz"
+  EXTENSION_WINDOWS: ".zip"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Linux executable
+        run: |
+          pyinstaller --onefile --name ${{ env.APP_NAME }} main.py
+          mkdir package
+          cp dist/${{ env.APP_NAME }} package/
+          tar -czf ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }} -C package .
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}${{ env.NAME_LINUX }}
+          path: ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }}
+
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Windows executable
+        run: |
+          pyinstaller --onefile --name ${{ env.APP_NAME }} main.py
+          mkdir package
+          copy dist\${{ env.APP_NAME }}.exe package\
+          powershell Compress-Archive -Path package\* -DestinationPath ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}${{ env.EXTENSION_WINDOWS }}
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}
+          path: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}${{ env.EXTENSION_WINDOWS }}
+
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}${{ env.NAME_LINUX }}
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Martyr ${{ github.ref_name }}"
+          body: ""
+          files: |
+            ${{ env.APP_NAME }}${{ env.NAME_LINUX }}${{ env.EXTENSION_LINUX }}
+            ${{ env.APP_NAME }}${{ env.NAME_WINDOWS }}${{ env.EXTENSION_WINDOWS }}

@@ -1,5 +1,6 @@
 import random as rand
 
+
 def text_to_strokes(
     text,
     typo_chance=0.1,
